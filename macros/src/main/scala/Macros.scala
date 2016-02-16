@@ -9,6 +9,14 @@ object helloMacro {
     val result = {
       annottees.map(_.tree).toList match {
         case q"object $name extends ..$parents { ..$body }" :: Nil =>
+          
+          //println(c.typecheck(q"class A")) // FIXME causes "no progress in completing object ..."
+          
+          // workaround:
+          if (c.enclosingClass.isEmpty) println(c.typecheck(q"class A"))
+          else // The following does NOT work on top-level defs:
+           println(c.typecheck(q"() => { class A }") match { case q"() => $cls" => cls })
+          
           q"""
             object $name extends ..$parents {
               def hello: ${typeOf[String]} = "hello"
